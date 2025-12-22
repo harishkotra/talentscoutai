@@ -139,7 +139,6 @@ All traces are sent to **Arize Phoenix**, allowing you to:
 -   Inspect the agent’s “thought process”
 -   Debug failures without reproducing them
 -   Compare successful vs failed runs
-    
 
 ----------
 
@@ -195,3 +194,11 @@ http://localhost:6006
 > They fail because systems are invisible.
 
 This project makes agents **visible, explainable, and safe to operate**.
+
+### Screenshots
+
+<img width="797" height="271" alt="image" src="https://github.com/user-attachments/assets/08bb9ff0-ecfb-444b-9906-88bdd87baf33" />
+
+<img width="1067" height="873" alt="image" src="https://github.com/user-attachments/assets/3ad533dc-9753-4c1b-9ebf-8b8967cbb330" />
+
+<img width="1667" height="1142" alt="image" src="https://github.com/user-attachments/assets/e7e31710-b50c-48c0-99f8-e29b582e8d95" />
