@@ -1,0 +1,14 @@
+langchain
+langchain-community
+langchain-ollama
+langchain-tavily
+langchain-mcp-adapters
+langgraph
+oracledb
+arize-phoenix
+openinference-instrumentation-langchain
+opentelemetry-sdk
+opentelemetry-exporter-otlp
+rich
+python-dotenv
+mcp
