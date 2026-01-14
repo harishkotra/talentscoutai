@@ -8,7 +8,7 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.markdown import Markdown
 from rich.syntax import Syntax
-from langchain_ollama import ChatOllama
+from langchain_ollama import ChatOllama, OllamaEmbeddings
 from langchain_tavily import TavilySearch
 from langchain_core.output_parsers import StrOutputParser
 from langgraph.graph import StateGraph, END
@@ -42,7 +42,7 @@ try:
     trace.set_tracer_provider(tracer_provider)
     LangChainInstrumentor().instrument(tracer_provider=tracer_provider)
 except Exception as e:
-    console.print(f"[yellow]⚠️ Observability skipped: {e}[/yellow]")
+    console.print(f"Observability skipped: {e}")
 
 llm = ChatOllama(model=os.getenv("OLLAMA_MODEL", "gemma2:9b"), temperature=0)
 
@@ -85,21 +85,46 @@ async def web_search_node(state: AgentState):
 async def db_mcp_node(state: AgentState):
     console.print(f"\nDB Agent: Connecting via Adapter...")
     
-    # Generate SQL
-    sql_prompt = f"""
-    You are an Oracle SQL generator. 
-    Table: talent_roster (actor_name, availability_status, min_fee_usd)
-    Search Context: {state['research_data']}
+    embeddings = OllamaEmbeddings(model="nomic-embed-text")
     
-    Task: Write a single SQL query to select actor_name and availability_status from talent_roster 
-    where availability_status = 'AVAILABLE'.
+    # 1. Embed the User Request (Semantic Search)
+    console.print(f"[dim]   -> Embedding query with nomic-embed-text...[/dim]")
+    query_vector = await asyncio.to_thread(embeddings.embed_query, state['request'])
+    vector_str = str(query_vector)
     
-    Output ONLY the raw SQL string. No formatting.
+    # 2. Vector Search SQL (Chunks for ORA-01704 fix)
+    # We split the large vector string into 2000-char chunks to avoid string literal limits
+    chunk_size = 2000
+    chunks = [vector_str[i:i+chunk_size] for i in range(0, len(vector_str), chunk_size)]
+    
+    plsql_build_clob = ""
+    for chunk in chunks:
+        plsql_build_clob += f"    v_clob := v_clob || '{chunk}';\n"
+
+    clean_sql = f"""
+    DECLARE
+        v_clob CLOB;
+        v_vec VECTOR;
+        v_res SYS_REFCURSOR;
+    BEGIN
+        v_clob := TO_CLOB('');
+{plsql_build_clob}
+        -- Cast to FLOAT64 to match standard oracledb insertions (array('d'))
+        v_vec := VECTOR(v_clob, *, FLOAT64);
+        
+        OPEN v_res FOR
+            SELECT actor_name, availability_status, bio
+            FROM talent_roster
+            WHERE availability_status = 'AVAILABLE'
+            ORDER BY VECTOR_DISTANCE(param_vector, v_vec, COSINE)
+            FETCH FIRST 3 ROWS ONLY;
+            
+        DBMS_SQL.RETURN_RESULT(v_res);
+    END;
+    /
     """
-    sql_raw = await (llm | StrOutputParser()).ainvoke(sql_prompt)
-    clean_sql = sql_raw.strip().replace("```sql", "").replace("```", "").rstrip(';')
     
-    console.print(Panel(Syntax(clean_sql, "sql", theme="monokai"), title="⚡ MCP: Sending to Oracle", border_style="yellow"))
+    console.print(Panel(Syntax(clean_sql[:300] + "... (truncated PL/SQL)", "sql", theme="monokai"), title="⚡ MCP: Sending Vector Query (PL/SQL)", border_style="yellow"))
 
     try:
         async with mcp_client.session("oracle") as session:
@@ -122,9 +147,11 @@ async def db_mcp_node(state: AgentState):
             db_pass = os.getenv("DB_APP_PASSWORD")
             db_dsn = os.getenv("DB_DSN")
 
+            # Note: For PL/SQL via SQLcl, ensures "/" is on a new line
             full_script = f"""
             connect {db_user}/{db_pass}@{db_dsn};
-            {clean_sql};
+            SET SERVEROUTPUT ON;
+            {clean_sql}
             """
             
             console.print(f"[dim]→ Executing via {use_tool} (arg: {arg_key})...[/dim]")

@@ -92,15 +92,15 @@ graph LR
 
 ----------
 
-### Database Agent (MCP)
+### Database Agent (Oracle 26ai Vector Search)
 
--   Generates SQL with an LLM
--   Sends SQL over MCP to Oracle SQLcl
--   Handles protocol mismatches gracefully
+-   **Native Vector Search**: Uses Oracle 26ai `VECTOR` data type and `VECTOR_DISTANCE` function.
+-   **Semantic Querying**: Matches actor "bios" semantically against user requests (e.g., "dark thriller" matches "intense" bio).
+-   **Secure Access**: Executes vector queries via Oracle SQLcl MCP Server.
 
 **Purpose:**
 
-> “What does our system of record allow?”
+> “Who in our roster *feels* right for this role?” (Semantic Match)
 
 ----------
 
@@ -168,13 +168,13 @@ sequenceDiagram
 ----------
 
 ## Tech Stack
-
--   **Agent Orchestration:** LangGraph
--   **LLM Runtime:** Ollama (running gemma3:12b)
--   **Web Search:** Tavily
--   **Enterprise DB:** Oracle Database
--   **Secure Access:** Oracle SQLcl MCP Server
--   **Observability:** OpenTelemetry + Arize Phoenix
+ 
+ -   **Agent Orchestration:** LangGraph
+ -   **LLM Runtime:** Ollama (running `gemma2:9b` & `nomic-embed-text`)
+ -   **Web Search:** Tavily
+ -   **Enterprise DB:** Oracle Database 26ai (Free Container)
+ -   **Secure Access:** Oracle SQLcl MCP Server
+ -   **Observability:** OpenTelemetry + Arize Phoenix
 
 ----------
 
