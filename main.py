@@ -30,6 +30,9 @@ if missing := [v for v in REQUIRED if not os.getenv(v)]:
     sys.exit(1)
 
 SQLCL_BIN = os.getenv("SQLCL_BIN")
+DB_USER = os.getenv("DB_APP_USER")
+DB_PASS = os.getenv("DB_APP_PASSWORD")
+DB_DSN = os.getenv("DB_DSN")
 
 if "PHOENIX_COLLECTOR_ENDPOINT" in os.environ:
     del os.environ["PHOENIX_COLLECTOR_ENDPOINT"]
@@ -143,13 +146,10 @@ async def db_mcp_node(state: AgentState):
                 use_tool = "sql"
                 arg_key = "sql"
 
-            db_user = os.getenv("DB_APP_USER")
-            db_pass = os.getenv("DB_APP_PASSWORD")
-            db_dsn = os.getenv("DB_DSN")
-
+            # Note: Credentials now handled in MultiServerMCPClient init
             # Note: For PL/SQL via SQLcl, ensures "/" is on a new line
             full_script = f"""
-            connect {db_user}/{db_pass}@{db_dsn};
+            connect {DB_USER}/{DB_PASS}@{DB_DSN};
             SET SERVEROUTPUT ON;
             {clean_sql}
             """
