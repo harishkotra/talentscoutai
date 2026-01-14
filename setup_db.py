@@ -57,23 +57,44 @@ def init_db():
         raw_data = [
             ('Cillian Murphy', 7000000, 'AVAILABLE', 9, 
              'Intense, distinctive Irish actor known for complex roles in Peaky Blinders and Oppenheimer. Great for psychological thrillers and leadership roles.'),
-            
             ('Pedro Pascal', 6000000, 'AVAILABLE', 10,
              'Charismatic, rugged actor known for The Mandalorian and The Last of Us. Excellent for action, sci-fi, and protective father figures.'),
-            
             ('Florence Pugh', 4500000, 'BOOKED', 10,
-             'Versatile, emotional powerhouse known for Midsommar and Black Widow. Great for period dramas and intense emotional thrillers.')
+             'Versatile, emotional powerhouse known for Midsommar and Black Widow. Great for period dramas and intense emotional thrillers.'),
+            ('Keanu Reeves', 12000000, 'AVAILABLE', 10,
+             'Legendary action star known for John Wick and The Matrix. specializes in stoic heroes, high-octane action, and sci-fi.'),
+            ('Tom Hardy', 8500000, 'AVAILABLE', 9,
+             'Physically creating and gritty actor known for Mad Max and Venom. Perfect for dark, brooding, or physically demanding roles.'),
+            ('Idris Elba', 8000000, 'AVAILABLE', 10,
+             'Commanding British actor known for Luther and The Wire. Brings gravitas, authority, and intense charisma to thrillers and dramas.'),
+            ('Anya Taylor-Joy', 5000000, 'AVAILABLE', 9,
+             'Unique, ethereal presence known for The Queen\'s Gambit and The Witch. Excellent for psychological horror, period pieces, and high-fashion drama.'),
+            ('Timothée Chalamet', 6000000, 'BOOKED', 9,
+             'Young, brooding heartthrob known for Dune and Call Me by Your Name. specialized in coming-of-age drama and sci-fi epics.'),
+            ('Viola Davis', 7500000, 'AVAILABLE', 10,
+             'Powerhouse dramatic actress known for Fences and The Woman King. Brings incredible emotional depth, strength, and authority.'),
+            ('Daniel Kaluuya', 6500000, 'AVAILABLE', 9,
+             'Intense and captivating actor known for Get Out and Judas and the Black Messiah. Master of psychological tension and social commentary.'),
+            ('Margot Robbie', 11000000, 'AVAILABLE', 10,
+             'Dynamic, high-energy star known for Barbie and Wolf of Wall Street. Brilliant at comedy, chaotic characters, and producing.'),
+            ('Emma Stone', 9000000, 'AVAILABLE', 10,
+             'Witty, expressive Oscar winner known for La La Land and Poor Things. Great for dark comedy, musicals, and quirky, complex leads.'),
+            ('Ryan Gosling', 10000000, 'AVAILABLE', 9,
+             'Charismatic leading man known for Drive and Barbie. Can do brooding silent types or hilarious comedic beat perfection.'),
+            ('Zendaya', 8000000, 'BOOKED', 9,
+             'Gen Z icon known for Euphoria and Dune. Brings raw emotion, style, and a modern edge to dramatic and sci-fi roles.'),
+            ('Willem Dafoe', 3000000, 'AVAILABLE', 10,
+             'Distinctive character actor known for The Lighthouse and Spider-Man. Perfect for villains, unhinged characters, and artistic horror.'),
+            ('Jenna Ortega', 4000000, 'AVAILABLE', 8,
+             'Rising star known for Wednesday and Scream. The new face of horror and dark comedy with a deadpan delivery.')
         ]
 
         print("   -> Generating Vector Embeddings for Seed Data...")
         final_data = []
         import array
         for row in raw_data:
-            # Embed the Bio
             vector = embeddings.embed_query(row[4]) 
-            # Convert list to array.array for oracledb VECTOR support
             vector_array = array.array('d', vector)
-            # Append vector to row tuple -> (name, fee, status, rating, bio, vector)
             final_data.append(row + (vector_array,))
         
         cursor.executemany("""

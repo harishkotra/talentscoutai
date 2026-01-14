@@ -209,8 +209,12 @@ async def main():
     console.clear()
     console.print(Panel("🎬 TALENT SCOUT AI", style="bold blue"))
     
-    user_request = "We need a dramatic actor for a Cyberpunk thriller."
-    
+    # user_request = "We need a dramatic actor for a Cyberpunk thriller."
+    try:
+        user_request = console.input("[bold yellow]Enter your casting request:[/bold yellow] ")
+    except KeyboardInterrupt:
+        return
+
     try:
         final_state = await app.ainvoke({"request": user_request})
         console.print("\n")
