@@ -202,3 +202,9 @@ This project makes agents **visible, explainable, and safe to operate**.
 <img width="1067" height="873" alt="image" src="https://github.com/user-attachments/assets/3ad533dc-9753-4c1b-9ebf-8b8967cbb330" />
 
 <img width="1667" height="1142" alt="image" src="https://github.com/user-attachments/assets/e7e31710-b50c-48c0-99f8-e29b582e8d95" />
+
+##### v2
+
+<img width="1189" height="1123" alt="image" src="https://github.com/user-attachments/assets/319b2f79-c96b-40b0-8dfa-814c86d65cf6" />
+
+<img width="1584" height="1299" alt="image" src="https://github.com/user-attachments/assets/7fd22d96-9e18-4fad-a5fe-08ff702816e3" />
